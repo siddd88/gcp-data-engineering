@@ -12,6 +12,11 @@ sc = SparkContext(conf=conf)
 
 sqlcontext = SQLContext(sc)
 
+cluster_name = "gs://cluster_name" # cluster in which kafka & zookeeper are installed  
+
+bucket_name = "gs://your_bucket_name"
+
+
 spark = SparkSession \
     .builder \
     .appName("user-logs-analysis-streaming") \
@@ -20,7 +25,7 @@ spark = SparkSession \
 df = spark \
       .readStream \
       .format("kafka") \
-      .option("kafka.bootstrap.servers", "spark-etl-w-1:9092") \
+      .option("kafka.bootstrap.servers", cluster_name+"-w-1:9092") \
       .option("subscribe", "user_browsing_logs") \
       .option("failOnDataLoss","false") \
       .load() \
@@ -48,16 +53,7 @@ df_tumbling_window = df_visits \
         df_visits.type) \
     .count()
 
-
-# df_tumbling_window = df_visits \
-#     .where("pid is not null") \
-#     .withWatermark("date_time", "2 minutes") \
-#     .groupBy(
-#         window(df_visits.date_time, "300 seconds"),
-#         df_visits.sub_cat,
-#         df_visits.type) \
-#     .count()
-
+""" For Testing / Debugging """
 
 # query = df_windowed_counts.writeStream \
 #             .outputMode("complete") \
@@ -72,21 +68,13 @@ def foreach_batch_function(df,epoch_id) :
     df.coalesce(1).write \
     .format("avro") \
     .mode("append") \
-    .option("checkpointLocation","gs://sidd-streams/spark-agg-checkpoints/") \
-    .option("path","gs://sidd-streams/stateful_aggregations/") \
+    .option("checkpointLocation",bucket_name+"/spark-agg-checkpoints/") \
+    .option("path",bucket_name+"/stateful_aggregations/") \
     .save()
         
 query = df_tumbling_window.writeStream.trigger(processingTime="20 seconds") \
           .outputMode("complete") \
           .format("console") \
           .start()
-
-# query = (
-#     df_tumbling_window.writeStream.trigger(processingTime="10 seconds") \
-#     .foreachBatch(foreach_batch_function)
-#     .outputMode("complete")
-#     .start()
-#     )
-
 
 query.awaitTermination()

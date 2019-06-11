@@ -1,7 +1,7 @@
 #!/bin/sh
 
 FUNCTION="hive_transformed_data"
-BUCKET="gs://sidd-streaming/"
+BUCKET="gs://your_bucket_name"
 
 gcloud functions deploy ${FUNCTION} \
     --runtime python37 \

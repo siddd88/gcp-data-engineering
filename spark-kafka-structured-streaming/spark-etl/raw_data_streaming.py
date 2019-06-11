@@ -12,6 +12,10 @@ sc = SparkContext(conf=conf)
 
 sqlcontext = SQLContext(sc)
 
+cluster_name = "gs://cluster_name" # cluster in which kafka & zookeeper are installed  
+
+bucket_name = "gs://your_bucket_name"
+
 spark = SparkSession \
     .builder \
     .appName("user-logs-analysis-streaming") \
@@ -20,7 +24,7 @@ spark = SparkSession \
 df = spark \
       .readStream \
       .format("kafka") \
-      .option("kafka.bootstrap.servers", "sparksql-etl-w-1:9092") \
+      .option("kafka.bootstrap.servers", cluster_name+"-w-1:9092") \
       .option("subscribe", "user_browsing_logs") \
       .option("failOnDataLoss","false") \
       .load() \
@@ -46,8 +50,8 @@ def foreach_batch_function(df,epoch_id) :
     df.coalesce(1).write \
     .format("parquet") \
     .mode("append") \
-    .option("checkpointLocation","gs://sidd-streaming/spark-checkpoints") \
-    .option("path","gs://sidd-streaming/streaming_data_output") \
+    .option("checkpointLocation",bucket_name+"/spark-checkpoints") \
+    .option("path",bucket_name+"/streaming_data_output") \
     .save()
 
 query = df_streaming_visits.writeStream \

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 FUNCTION="update_visits_by_categories"
-BUCKET="gs://sidd-visits-analysis/"
+BUCKET="gs://your_bucket_name"
 
 gcloud functions deploy ${FUNCTION} \
     --runtime python37 \

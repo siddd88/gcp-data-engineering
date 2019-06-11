@@ -15,3 +15,6 @@ tail -f server-logs/server_* | \
 /usr/lib/kafka/bin/kafka-console-producer.sh --broker-list ${CLUSTER_NAME}-w-0:9092 --topic user_browsing_logs &
 
 /usr/lib/kafka/bin/kafka-console-consumer.sh --bootstrap-server ${CLUSTER_NAME}-w-1:9092 --topic user_browsing_logs --from-beginning
+
+
+/usr/lib/kafka/bin/kafka-console-consumer.sh --bootstrap-server ${CLUSTER_NAME}-w-1:9092 --topic high_consumption_alerts --from-beginning

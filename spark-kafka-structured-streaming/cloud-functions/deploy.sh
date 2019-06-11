@@ -1,7 +1,7 @@
 #!/bin/sh
 
 FUNCTION="update_user_cart"
-BUCKET="gs://sidd-streams/"
+BUCKET="gs://your_bucket_name"
 
 gcloud functions deploy ${FUNCTION} \
     --runtime python37 \
