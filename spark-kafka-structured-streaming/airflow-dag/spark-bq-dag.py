@@ -5,7 +5,7 @@ from airflow.contrib.operators.dataproc_operator import DataProcPySparkOperator
 
 from airflow.models import * 
 
-BUCKET = "gs://sidd-streaming"
+BUCKET = "gs://your_bucket_name"
 
 PYSPARK_JOB = BUCKET + "/sparksql-hive/hivesql-etl.py"
 
@@ -16,7 +16,7 @@ DEFAULT_DAG_ARGS = {
 	"email_on_failure":False,
 	"retries":1,
 	"retry_delay":timedelta(minutes=5),
-	"project_id":"spark-streaming-etl-242619",
+	"project_id":"your_project_id",
 	"schedule_interval":"*/15 * * * * "
 }
 
