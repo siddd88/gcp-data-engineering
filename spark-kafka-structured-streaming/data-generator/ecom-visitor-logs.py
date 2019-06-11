@@ -16,6 +16,7 @@ import json
 
 from kafka import KafkaProducer
 
+cluster_name = "gs://cluster_name" # cluster in which kafka & zookeeper are installed  
 
 class switch(object):
     def __init__(self, value):
@@ -23,7 +24,6 @@ class switch(object):
         self.fall = False
 
     def __iter__(self):
-        """Return the match method once, then stop"""
         yield self.match
         raise StopIteration
 
@@ -36,9 +36,8 @@ class switch(object):
         else:
             return False
 
-parser = argparse.ArgumentParser(__file__, description="Fake Apache Log Generator")
+parser = argparse.ArgumentParser(__file__, description="User Visit Generator")
 parser.add_argument("--output", "-o", dest='output_type', help="Write to a Log file, a gzip file or to STDOUT", choices=['LOG','GZ','CONSOLE'] )
-#parser.add_argument("--log-format", "-l", dest='log_format', help="Log format, Common or Extended Log Format ", choices=['CLF','ELF'], default="ELF" )
 parser.add_argument("--log-format", "-l", dest='log_format', help="Log format, Common or Extended Log Format ", choices=['CLF','ELF',"common"])
 parser.add_argument("--num", "-n", dest='num_lines', help="Number of lines to generate (0 for infinite)", type=int, default=1)
 parser.add_argument("--prefix", "-p", dest='file_prefix', help="Prefix the output file name", type=str)
@@ -95,7 +94,6 @@ while (flag):
 
     ip = faker.ipv4()
     fake_state = faker.state() #US States
-    #dt = otime.strftime('%d/%b/%Y:%H:%M:%S')
     dt = otime.strftime("%Y-%m-%d %H:%M:%S")
     tz = datetime.datetime.now(local).strftime('%z')
     vrb = numpy.random.choice(verb,p=[0.6,0.1,0.1,0.2])
@@ -111,7 +109,7 @@ while (flag):
     useragent = numpy.random.choice(ualist,p=[0.5,0.3,0.1,0.05,0.05] )()
     
 
-    producer = KafkaProducer(bootstrap_servers=['sparksql-etl-w-0:9092'],value_serializer=lambda v: json.dumps(v).encode('utf-8'))
+    producer = KafkaProducer(bootstrap_servers=[cluster_name+'-w-0:9092'],value_serializer=lambda v: json.dumps(v).encode('utf-8'))
 
 
     uri_segments = [i for i in uri.split("/") if i !='']
@@ -129,4 +127,3 @@ while (flag):
         time.sleep(args.sleep)
     else : 
         time.sleep(2)
-        
