@@ -106,7 +106,7 @@ def hive_transformed_data(data,context) :
 
     job_config.source_format = bigquery.SourceFormat.PARQUET
 
-    uri = "gs://sidd-streaming/streaming-etl-output/*.parquet"
+    uri = bucketname+"/streaming-etl-output/*.parquet"
 
     load_job = client.load_table_from_uri(uri,dataset_ref.table('hive_transformed_data'),job_config=job_config)
 
