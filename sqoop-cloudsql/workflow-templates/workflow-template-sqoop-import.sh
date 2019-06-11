@@ -1,10 +1,12 @@
 #!/bin/bash
 
-bucket="gs://sidd-etl"
+bucket="gs://your_bucket_name"
 template_name="mysql-flights-import"
-cluster_name="sqoop-import"
-instance_name="bigdata-etl-240212:us-central1:mysql-instance"
+cluster_name="your_cluster_name"
+instance_name="your_cloudsql_instance_name"
 table_name="flights"
+
+$pwd_file="gs://your_bucket_name/pwd_directory/pwd.txt"
 
 #gsutil rm -r $bucket/$table_name && 
 
@@ -35,7 +37,7 @@ file:///usr/share/java/mysql-connector-java-5.1.42.jar \
 -- import -Dmapreduce.job.classloader=true \
 --driver com.mysql.jdbc.Driver \
 --connect="jdbc:mysql://localhost:3307/airports" \
---username=root --password=Siddharth88!@ \
+--username=root --password-file=$pwd_file \
 --target-dir /sqoop_output \
 --split-by id  \
 --table flights -m 4 \
@@ -44,7 +46,7 @@ file:///usr/share/java/mysql-connector-java-5.1.42.jar \
 --last-value 2014-04-13 \
  --as-avrodatafile &&
 
-gcloud compute ssh $cluster_name-m-0 -- -T "hadoop distcp /sqoop_output/*.avro gs://sidd-etl/sqoop_output/" 
+gcloud compute ssh $cluster_name-m-0 -- -T "hadoop distcp /sqoop_output/*.avro gs://your_bucket_name/sqoop_output/" 
 
 # --class=org.apache.sqoop.Sqoop \
 # --jars=$bucket/sqoop-jars/sqoop_sqoop-1.4.7.jar,$bucket/sqoop-jars/sqoop_avro-tools-1.8.2.jar,\
@@ -52,7 +54,7 @@ gcloud compute ssh $cluster_name-m-0 -- -T "hadoop distcp /sqoop_output/*.avro g
 # -- import -Dmapreduce.job.classloader=true \
 # --driver com.mysql.jdbc.Driver \
 # --connect="jdbc:mysql://localhost:3307" \
-# --username=root --password=Siddharth88!@ \
+# --username=root --password-file=$pwd_file \
 # --query "select * from airports.flights where 1=1 and \$CONDITIONS limit 100" \
 # --target-dir $bucket/sqoop-output/$table_name \
 # --split-by flight_num -m 2 && 
