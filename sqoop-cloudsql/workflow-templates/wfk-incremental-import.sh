@@ -1,10 +1,12 @@
 #!/bin/bash
 
-bucket="gs://test-sid"
+bucket="gs://your_bucket_name"
 template_name="mysql-flights-import"
-cluster_name="sqoop-import"
-instance_name="bigdata-etl:us-central1:mysql-instance"
+cluster_name="your_cluster_name"
+instance_name="your_cloudsql_instance_name"
 table_name="flights"
+
+$pwd_file="gs://your_bucket_name/pwd_directory/pwd.txt"
 
 #gsutil rm -r $bucket/$table_name && 
 
@@ -35,27 +37,10 @@ file:///usr/share/java/mysql-connector-java-5.1.42.jar \
 -- import -Dmapreduce.job.user.classpath.first=true \
 --driver com.mysql.jdbc.Driver \
 --connect="jdbc:mysql://localhost:3307/airports" \
---username=root --password=Siddharth88!@ \
+--username=root --password-file=$pwd_file \
 --table flights \
 --split-by id -m 4 \
 --delete-target-dir \
---target-dir gs://test-sid/sqoop_output/ &&
-
-# gcloud beta dataproc workflow-templates add-job hadoop \
-# --step-id=flights_test_data \
-# --workflow-template=$template_name \
-# --class=org.apache.sqoop.Sqoop \
-# --jars=$bucket/sqoop-jars/sqoop_sqoop-1.4.7.jar,$bucket/sqoop-jars/sqoop_avro-tools-1.8.2.jar,\
-# file:///usr/share/java/mysql-connector-java-5.1.42.jar \
-# -- import -Dmapreduce.job.user.classpath.first=true \
-# --driver com.mysql.jdbc.Driver \
-# --connect="jdbc:mysql://localhost:3307" \
-# --username=root --password=Siddharth88!@ \
-# --query "select * from airports.flights where 1=1 and \$CONDITIONS limit 100" \
-# --split-by flight_num -m 4 \
-# --check-column id \
-# --incremental append \
-# --last-value 0 \
-# --target-dir gs://spark-buket/sqoop_output &&
+--target-dir $bucket/sqoop_output/ &&
 
 gcloud beta dataproc workflow-templates instantiate $template_name
