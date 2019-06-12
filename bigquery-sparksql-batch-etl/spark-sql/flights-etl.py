@@ -36,11 +36,12 @@ current_date = date.today()
 
 file_name = str(current_date)
 
+bucket_name = "gs://bucket_name"
 
 # In[9]:
 
 
-flights_data = spark.read.json("gs://sid-etl/flights-data/"+file_name+".json")
+flights_data = spark.read.json(bucket_name+"/flights-data/"+file_name+".json")
 
 
 # In[11]:
@@ -131,15 +132,11 @@ avg_delays_by_distance_category = spark.sql(qry)
 # In[33]:
 
 
-output_flight_nums = "gs://sid-etl/flights_data_output/"+file_name+"_flight_nums"
-output_distance_category = "gs://sid-etl/flights_data_output/"+file_name+"_distance_category"
+output_flight_nums = bucket_name+"/flights_data_output/"+file_name+"_flight_nums"
+output_distance_category = bucket_name+"/flights_data_output/"+file_name+"_distance_category"
 
 avg_delays_by_flight_nums.coalesce(1).write.format("json").save(output_flight_nums)
 avg_delays_by_distance_category.coalesce(1).write.format("json").save(output_distance_category)
-
-
-# In[ ]:
-
 
 
 
