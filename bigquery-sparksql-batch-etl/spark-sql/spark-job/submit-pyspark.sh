@@ -1,2 +1,2 @@
 gcloud dataproc jobs submit pyspark \
-gs://sid-etl/spark-job/flights-etl.py --cluster=spark-dwh --region=us-east1 
+gs://your_bucket_name/spark-job/flights-etl.py --cluster=spark-dwh --region=us-east1 

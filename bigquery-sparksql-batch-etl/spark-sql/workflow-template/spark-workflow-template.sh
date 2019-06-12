@@ -1,7 +1,7 @@
 template_name="flights_etl"
 cluster_name="spark-job-flights"
 current_date=$(date +"%Y-%m-%d")
-bucket=gs://sid-etl
+bucket=gs://bucket_name
 
 gcloud dataproc workflow-templates delete -q $template_name  &&
 

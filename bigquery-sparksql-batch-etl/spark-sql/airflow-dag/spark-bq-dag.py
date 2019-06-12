@@ -15,7 +15,9 @@ from airflow.utils.trigger_rule import TriggerRule
 
 current_date = str(date.today())
 
-BUCKET = "gs://sidd-etl"
+BUCKET = "gs://bucket_name"
+
+PROJECT_ID = "your_project_id"
 
 PYSPARK_JOB = BUCKET + "/spark-job/flights-etl.py"
 
@@ -27,7 +29,7 @@ DEFAULT_DAG_ARGS = {
     "email_on_retry":False,
     "retries": 1,
     "retry_delay":timedelta(minutes=5),
-    "project_id":"bigdata-etl-240212",
+    "project_id":PROJECT_ID,
     "scheduled_interval":"30 2 * * *"
 }
 
@@ -54,9 +56,9 @@ with DAG("flights_delay_etl",default_args=DEFAULT_DAG_ARGS) as dag :
     bq_load_delays_by_distance = GoogleCloudStorageToBigQueryOperator(
 
         task_id = "bq_load_avg_delays_by_distance",
-        bucket="sidd-etl",
+        bucket=BUCKET,
         source_objects=["flights_data_output/"+current_date+"_distance_category/part-*"],
-        destination_project_dataset_table="bigdata-etl-240212.data_analysis.avg_delays_by_distance",
+        destination_project_dataset_table=PROJECT_ID+".data_analysis.avg_delays_by_distance",
         autodetect = True,
         source_format="NEWLINE_DELIMITED_JSON",
         create_disposition="CREATE_IF_NEEDED",
@@ -68,9 +70,9 @@ with DAG("flights_delay_etl",default_args=DEFAULT_DAG_ARGS) as dag :
     bq_load_delays_by_flight_nums = GoogleCloudStorageToBigQueryOperator(
 
         task_id = "bq_load_delays_by_flight_nums",
-        bucket="sidd-etl",
+        bucket=BUCKET,
         source_objects=["flights_data_output/"+current_date+"_flight_nums/part-*"],
-        destination_project_dataset_table="bigdata-etl-240212.data_analysis.avg_delays_by_flight_nums",
+        destination_project_dataset_table=PROJECT_ID+".data_analysis.avg_delays_by_flight_nums",
         autodetect = True,
         source_format="NEWLINE_DELIMITED_JSON",
         create_disposition="CREATE_IF_NEEDED",
